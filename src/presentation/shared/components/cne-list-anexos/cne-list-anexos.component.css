@@ -1,0 +1,6 @@
+.listButtonDelete{
+scale: 0.7 !important;
+}
+::ng-deep .listButtonDelete .dx-button-text {
+  scale: 1.4 !important;
+  }

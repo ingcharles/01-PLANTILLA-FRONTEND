@@ -1,0 +1,23 @@
+<ng-container [formGroup]="form">
+<div class="row mb-2">
+  <div class="col-12">
+      <div class="row">
+          <div class="col-4 text-end">
+              <label><strong>Seleccione Archivo:</strong> </label>
+          </div>
+          <div class="col-8">
+            <!--(onValueChanged)="onSelected($event)"--> 
+              <dx-file-uploader  selectButtonText="Examinar"  [multiple]="true" (onValueChanged)="onSelected($event)" 
+              labelText="" accept=".pdf" [(value)]="items" uploadMode="useFrom" 
+               [allowedFileExtensions]="['.pdf']" [maxFileSize]="4000000" invalidMaxFileSizeMessage="Tamaño supera los 4MB"
+               >
+              </dx-file-uploader>
+              <!-- <dx-button stylingMode="contained" text="Subir" type="default" [disabled]="false"
+                  (onClick)="subirArchivo()" class="mx-2">
+              </dx-button> -->
+          </div>
+      </div>
+  </div>
+</div>
+</ng-container>
+<!-- <pre>{{items | json}}</pre> -->

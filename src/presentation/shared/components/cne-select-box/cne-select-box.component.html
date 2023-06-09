@@ -1,0 +1,13 @@
+
+<ng-container [formGroup]="form">
+  <dx-select-box
+  [dataSource]="dataSource"
+  displayExpr="{{displayExpr}}"
+  valueExpr="{{valueExpr}}"
+  [placeholder]="placeholder"
+  [(value)]="value"
+  validationMessagePosition="left"
+  [searchEnabled]="true" noDataText="No hay data" (onSelectionChanged)="this.onSelectionChanged.emit($event)" formControlName="{{controlName}}"
+  >
+  </dx-select-box>
+</ng-container>
