@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, Pipe, AfterContentInit } from '@angular/core';
 import { FormBuilder,  FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { switchMap } from 'rxjs';
+import { map, switchMap } from 'rxjs';
 import * as customValidators from 'src/base/validators';
 import { messages } from 'src/base/messages';
 import * as catalogo from 'src/base/constants';
@@ -16,6 +16,8 @@ import { AlertsService } from 'src/base/alerts.service';
 import { GetGeneralUseCase } from 'src/domain/general/usercases/get-general.usecase';
 import { UpdateCrcaUseCase } from 'src/domain/crca/usecases/update-crca.usecase';
 import { CrcaNumerarioViewModel } from 'src/domain/crca/viewModels/crca-numerario.viewModel';
+import { ListArchivo } from 'src/presentation/shared/interfaces/list-archivo.inteface';
+import { PersonaRSViewModel } from 'src/domain/viewModels/persona.viewModel';
 @Component({
   providers: [CrcaMapper],
   selector: 'create-crca',
@@ -52,7 +54,7 @@ export class CreateComponent implements OnInit {
   /** objeto de tipo ClaseArchivo array */
   public arrayClaseArchivo: Archivo[] = [];
 
-  public listArchivos: { name: string, description: string, file: File }[] = [];
+  public listArchivos: ListArchivo[] = [];
 
   /** variable para almacenar tipo de aportante  */
   public tipoAportante: any[] = [];
@@ -65,21 +67,21 @@ export class CreateComponent implements OnInit {
   archivos: any[] = [];
   /** creacion de variables y validación del formulario */
   formCrca: FormGroup = this.fb.group({
-    codigoCrca: [''],
+    codigoCrca: [null],
     dniAportante: ['', [Validators.required, Validators.minLength(10), Validators.pattern(customValidators.twoDecimal)]],
     nombreAportante: ['', [Validators.required]],
     codigoCatalogoTipoCrca: [26, [Validators.required]],
-    codigoCatalogoTipoAporteCrca: ['', [Validators.required]],
+    codigoCatalogoTipoAporteCrca: [null, [Validators.required]],
     codigoDatoPersonal: [21, [Validators.required]],
     codigoContabilidad: [1],
     fechaRecepcion: ['', [Validators.required]],
     valorLetras: ['', [Validators.required]],
-    valorNumero: ['', [Validators.required, Validators.pattern(customValidators.twoDecimal)]],
+    valorNumero: [null, [Validators.required, Validators.pattern(customValidators.twoDecimal)]],
     detalleAporte: ['', [Validators.required]],
     detalleAporteEspecie: ['detalle', [Validators.required]],
     estado: [1, [Validators.required]],
     documentos: [
-      [], [Validators.required]
+      []
     ]
 
   });
@@ -88,11 +90,10 @@ export class CreateComponent implements OnInit {
   }
   agregarArchivo(e: event) {
     // e.preventDefault;
-
     this.listArchivos.push({ name: this.archivos[0].name, description: this.descriptionArchivo, file: this.archivos[0] });
     this.archivos = [];
     this.descriptionArchivo = '';
-
+    this.formCrca.value["documentos"] = this.listArchivos;
   }
   // /**
   //  *  Se ejecuta al cargar este componente
@@ -132,23 +133,27 @@ export class CreateComponent implements OnInit {
         switchMap(({ id }) => {
          return this._getCrcaUseCase.getCrcaByCod({codigoCrca:parseInt(atob(id))})
         }),
-      ).subscribe(resultCrca => {
+      ).pipe(
+        map(result=>this._crcaMapper.mapCrcaFrom(result))
+      )
+      .subscribe(resultCrca => {
         console.log(resultCrca);
         if (!resultCrca) {
           /** Retorna a la ruta raiz  */
           return this.router.navigateByUrl('/crca');
         }
-
             /** se ejecuta cuando no encuentra una persona */
             if (!resultCrca.ok) {
               // this.formCrca.reset({ ...this.formCrca.value, nombreAportante: null, codigoDatoPersonal: catalogo.COD_DAT_PERSONAL })
-              this._alertService.alertMessage("Advertencia!", resultCrca.messages, 'warning');
+              this._alertService.alertMessage("Advertencia!", resultCrca.message, 'warning');
               return;
             }
             /** se ejecuta cuando no encuentra una persona */
             if (resultCrca.ok) {
-              const mapResultCrca = this._crcaMapper.mapCrcaFrom(resultCrca.data);
-              const bodyArchivo = { codigoTabla: mapResultCrca.codigoCrca, nombreTabla: 'CRCA' };
+             
+              // console.log("resultCrca.data",JSON.stringify(resultCrca));
+              //  const mapResultCrca = this._crcaMapper.mapCrcaFrom(resultCrca.data);
+              const bodyArchivo = { codigoTabla: resultCrca.data!.codigoCrca, nombreTabla: 'CRCA' };
 
               this._getGeneralUseCase.getArchivoByCodTab(bodyArchivo).subscribe(resultArchivo => {
                 console.log(resultArchivo);
@@ -159,21 +164,22 @@ export class CreateComponent implements OnInit {
                 }
 
                 const archivoTemp: any[] = [];
-                for (let index = 0; index < resultArchivo.data.length; index++) {
-                 // archivoTemp.push({ base64String: resultArchivo.data[index]["documento"], name: resultArchivo.data[index]["nombre"], size: 0, type: 'pdf' });
-                  this.listArchivos.push({ name: resultArchivo.data[index]["nombre"], description: resultArchivo.data[index]["descripcion"], file: resultArchivo.data[index]["documento"] });
-                }
+                // for (let index = 0; index < resultArchivo.data.length; index++) {
+                //  // archivoTemp.push({ base64String: resultArchivo.data[index]["documento"], name: resultArchivo.data[index]["nombre"], size: 0, type: 'pdf' });
+                //   this.listArchivos.push({ name: resultArchivo.data[index]["nombre"], description: resultArchivo.data[index]["descripcion"], file: resultArchivo.data[index]["documento"] });
+                
+                // }
                // this.archivos = archivoTemp;
-
+               console.log("this.listArchivos.",JSON.stringify(this.listArchivos));
                 return;
               })
              
-              this.formCrca.reset(mapResultCrca);
+              this.formCrca.reset( resultCrca.data);
               this.bandera=1;
             }
 
 
-        console.log("resultCrca.data"+resultCrca.data);
+        //console.log("resultCrca.data"+resultCrca.data);
 
         /** Objeto cuerpo para enviar al servicio */
 
@@ -217,9 +223,6 @@ export class CreateComponent implements OnInit {
     });
     /** Variables con todos lo campos que necesita el servicio */
     //const crcaNumerario: CrcaNumerario = { auditoria: "2edf8b3e2f5a424fa8333ba742154869|1202|151|192.168.1.1|Chrome|I|Guardar información del Crca en Especie|01" };
-    /** Consolidar la informacion claseCrca y claseArchivo */
-    //crcaNumerario.claseCrca = <ClaseCrca>this.formCrca.value;
-    //crcaNumerario.claseArchivo = this.arrayClaseArchivo;
     /** Entra al if si existe el codigoCrca o esta vacio --- Nuevo o editar */
     if (this.currentCrca.codigoCrca) {
       alert("entro en actualizar")
@@ -237,11 +240,11 @@ export class CreateComponent implements OnInit {
 
     this._saveCrcaUseCase.saveCrcaNumerario(await this._crcaMapper.mapCrcaNumerarioTo(this.formCrca.value as CrcaNumerarioViewModel)).subscribe(
       result => {
-        if (result.statusCode === 200) {
-          alert("se guardo correctamente");
-        } else {
-          alert(result.messages);
-        }
+         if (result.ok) {
+          this._alertService.alertMessage("Advertencia!", result.message, 'success');
+         } else {
+          this._alertService.alertMessage("Advertencia!", result.message, 'warning');
+         }
       }
     );
     return;
@@ -285,18 +288,23 @@ export class CreateComponent implements OnInit {
 
     //servicio para obtener información de la persona
     let body: any = { cedulaIdentidad: this.formCrca.value['dniAportante'] };
-    this._getGeneralUseCase.getPersonaByCi(body).subscribe(
+    this._getGeneralUseCase.getPersonaByCi(body).pipe(map(data=>{
+      console.log("data",data);
+      return this._crcaMapper.mapPersonaByCiFrom(data)}
+      )).subscribe(
       result => {
+        console.log("result",result)
         /** se ejecuta cuando no encuentra una persona */
         if (!result.ok) {
           this.formCrca.reset({ ...this.formCrca.value, nombreAportante: null, codigoDatoPersonal: catalogo.COD_DAT_PERSONAL })
-          this._alertService.alertMessage("Advertencia!", result.messages, 'warning');
+          this._alertService.alertMessage("Advertencia!", result.message, 'warning');
           return;
         }
+        console.log(result);
         /** se ejecuta cuando no encuentra una persona */
         if (result.ok) {
-          const mapResult = this._crcaMapper.mapPersonaByCiFrom(result.data);
-          this.formCrca.reset({ ...this.formCrca.value, nombreAportante: mapResult['nombres'], codigoDatoPersonal: catalogo.COD_DAT_PERSONAL })
+          // const mapResult = this._crcaMapper.mapPersonaByCiFrom(result.data);
+          this.formCrca.reset({ ...this.formCrca.value, nombreAportante: result.data?.nombres, codigoDatoPersonal: catalogo.COD_DAT_PERSONAL })
         }
 
       }

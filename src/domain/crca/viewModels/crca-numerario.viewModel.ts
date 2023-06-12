@@ -1,3 +1,5 @@
+import { ListArchivo } from "src/presentation/shared/interfaces/list-archivo.inteface";
+
 export interface CrcaNumerarioViewModel {
   codigoCrca: number;
   codigoDatoPersonal: number | null;
@@ -13,5 +15,5 @@ export interface CrcaNumerarioViewModel {
   detalleAporteEspecie: string | null;
   estado: number | null;
   auditoria:string;
-  documentos?: Array<File> | null;
+  documentos?: ListArchivo[] | null;
 }

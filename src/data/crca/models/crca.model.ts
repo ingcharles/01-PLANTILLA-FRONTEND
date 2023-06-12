@@ -1,3 +1,9 @@
+import { ResponseStatus, ResponseStatusError } from "src/data/models/response-status.model";
+
+export interface CrcaRSModel extends ResponseStatusError{
+  data?:CrcaModel
+}
+
 export interface CrcaModel {
   codigoCrca: number;
   codigoDatoPersonal: number | null;

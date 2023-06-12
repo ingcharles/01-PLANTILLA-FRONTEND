@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { ResponseStatus } from 'src/data/models/response-status.model';
 import { IGeneralService } from '../services/igeneral-service';
 import { CatalogoModel } from 'src/data/models/catalogo.model';
+import { PersonaRSViewModel } from 'src/domain/viewModels/persona.viewModel';
 /**
  * Los casos de uso solo definen como se comporta nuestro sistema,
  * definiendo los datos de entrada necesarios, y cual será su salida.
@@ -19,7 +20,7 @@ export class GetGeneralUseCase {
     return this.iGeneralService.getCatalogoByCodPad(body);
   }
 
-  getPersonaByCi(body: {cedulaIdentidad:string}): Observable<ResponseStatus> {
+  getPersonaByCi(body: {cedulaIdentidad:string}): Observable<any> {
     return this.iGeneralService.getPersonaByCi(body);
   }
   getArchivoByCodTab(body: { codigoTabla: number, nombreTabla: string }): Observable<ResponseStatus> {

@@ -4,6 +4,7 @@ import { ResponseStatus } from 'src/data/models/response-status.model';
 
 import { CrcaNumerarioModel } from 'src/data/crca/models/crca-numerario.model';
 import { ICrcaService } from '../services/icrca.service';
+import { CrcaRSModel } from 'src/data/crca/models/crca.model';
 
 /**
  * Los casos de uso solo definen como se comporta nuestro sistema,
@@ -18,7 +19,8 @@ export class SaveCrcaUseCase {
   constructor(private iCrcaService : ICrcaService) { }
 
 
-  saveCrcaNumerario(CrcaNumerario: CrcaNumerarioModel): Observable<ResponseStatus> {
+  saveCrcaNumerario(CrcaNumerario: CrcaNumerarioModel): Observable<CrcaRSModel> {
+    console.log("CrcaNumerario",CrcaNumerario);
     return this.iCrcaService.saveCrcaNumerario(CrcaNumerario);
 
   }

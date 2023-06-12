@@ -1,3 +1,8 @@
+import { ResponseStatus } from "src/data/models/response-status.model";
+
+export interface CrcaRSViewModel extends  ResponseStatus{
+  data?:CrcaViewModel | null;
+ }
 export interface CrcaViewModel {
   codigoCrca: number;
   codigoDatoPersonal: number | null;

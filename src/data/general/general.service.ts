@@ -8,6 +8,7 @@ import { NGXLogger } from 'ngx-logger';
 import { ResponseStatus } from 'src/data/models/response-status.model';
 import { StatusResponseService } from 'src/base/status-response.service';
 import { IGeneralService } from 'src/domain/general/services/igeneral-service';
+import { PersonaRSViewModel } from 'src/domain/viewModels/persona.viewModel';
 
 @Injectable({
   providedIn: 'root'
@@ -22,16 +23,19 @@ export class GeneralService extends IGeneralService {
     return this._http.post<any>(url, body);
   }
 
-  getPersonaByCi(body: { cedulaIdentidad: string }): Observable<ResponseStatus> {
+  getPersonaByCi(body: { cedulaIdentidad: string }): Observable<any> {
     const url = `${this.url}/Persona/GetPersonaByCi`
     return this._http.post<any>(url, body).pipe(catchError(error => {
+     
       return of(this._statusResponseService.error(error))
-    }), map(res => {
-      if (res.Ok) {
-        return this._statusResponseService.ok(res);
-      }
-      return res;
-    })
+     })
+    //, map(res => {
+    //   console.log("res", res);
+    //   // if (res.Ok) {
+    //     // return this._statusResponseService.ok(res);
+    //   // }
+    //    return res;
+    // })
     );
   }
   
@@ -41,6 +45,7 @@ export class GeneralService extends IGeneralService {
       this._logger.error("Error al obtener los archivos", "/General/GetArchivoByCodTab", JSON.stringify(body));
       return of(this._statusResponseService.error(error))
     }), map(res => {
+  
       if (res.Ok) {
         return this._statusResponseService.ok(res);
       }
