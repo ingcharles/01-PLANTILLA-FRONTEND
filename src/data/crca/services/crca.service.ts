@@ -31,12 +31,6 @@ export class CrcaService extends ICrcaService {
       this._logger.error("Error al obtener los datos del crca", "/Crca/GetCrcaByCod", JSON.stringify(body));
       return of(this._statusResponseService.error(error))
     })
-    // , map(res => {
-    //   if (res.Ok) {
-    //     return res;
-    //   }
-    //   return res;
-    // })
     );
   }
 

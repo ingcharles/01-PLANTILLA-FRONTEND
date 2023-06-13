@@ -10,7 +10,7 @@ import { ReactiveFormsModule } from '@angular/forms';
   imports: [
     CommonModule,
   ],exports:[   
-     DxFileUploaderModule,
+    DxFileUploaderModule,
     DxButtonModule,
     DxSelectBoxModule,
     DxValidatorModule,
@@ -21,7 +21,6 @@ import { ReactiveFormsModule } from '@angular/forms';
     DxTextAreaModule,
     DxDateBoxModule,
     DxNumberBoxModule
-    
   ]
 })
 export class DevextremeModule { }

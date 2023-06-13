@@ -83,7 +83,6 @@ export class CreateComponent implements OnInit {
     documentos: [
       []
     ]
-
   });
   select2(e: any) {
     console.log(this.archivos);
@@ -150,8 +149,6 @@ export class CreateComponent implements OnInit {
             }
             /** se ejecuta cuando no encuentra una persona */
             if (resultCrca.ok) {
-             
-              // console.log("resultCrca.data",JSON.stringify(resultCrca));
               //  const mapResultCrca = this._crcaMapper.mapCrcaFrom(resultCrca.data);
               const bodyArchivo = { codigoTabla: resultCrca.data!.codigoCrca, nombreTabla: 'CRCA' };
 
